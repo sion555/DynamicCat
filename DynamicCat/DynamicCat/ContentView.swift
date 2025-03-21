@@ -14,7 +14,7 @@ struct ContentView: View {
     @State private var isSettingsPresented = false
     @State private var currentActivity: Activity<DynamicCatLiveActivityAttributes>? = nil
     
-    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    private let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     
     var body: some View {
         ZStack {
@@ -185,13 +185,21 @@ struct ContentView: View {
         }
     }
     
-    // Live Activity 시작
+    // LiveActivity 시작 함수 수정
     private func startLiveActivity() {
-        guard currentActivity == nil else { return }
+        // 로그 추가
+        print("Attempting to start Live Activity")
         
-        // 권한 확인 추가
-        guard ActivityAuthorizationInfo().areActivitiesEnabled else {
-            print("Live Activities are not enabled")
+        guard currentActivity == nil else {
+            print("Activity already exists")
+            return
+        }
+        
+        // 명시적으로 권한 확인
+        if ActivityAuthorizationInfo().areActivitiesEnabled {
+            print("Live Activities are enabled")
+        } else {
+            print("Live Activities are NOT enabled")
             return
         }
         
@@ -209,10 +217,10 @@ struct ContentView: View {
                 attributes: attributes,
                 content: ActivityContent(state: contentState, staleDate: nil)
             )
-            print("Successfully requested Live Activity \(activity.id)")
+            print("Successfully requested Live Activity: \(activity.id)")
             currentActivity = activity
         } catch {
-            print("Error requesting Live Activity: \(error)")
+            print("Error requesting Live Activity: \(error.localizedDescription)")
         }
     }
     
