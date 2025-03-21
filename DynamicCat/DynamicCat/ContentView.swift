@@ -189,6 +189,12 @@ struct ContentView: View {
     private func startLiveActivity() {
         guard currentActivity == nil else { return }
         
+        // 권한 확인 추가
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else {
+            print("Live Activities are not enabled")
+            return
+        }
+        
         let attributes = DynamicCatLiveActivityAttributes(name: "DynamicCat")
         let contentState = DynamicCatLiveActivityAttributes.ContentState(
             cpuUsage: systemMonitor.cpuUsage,
@@ -201,15 +207,15 @@ struct ContentView: View {
         do {
             let activity = try Activity.request(
                 attributes: attributes,
-                content: .init(state: contentState, staleDate: nil)
+                content: ActivityContent(state: contentState, staleDate: nil)
             )
+            print("Successfully requested Live Activity \(activity.id)")
             currentActivity = activity
         } catch {
-            print("Error starting live activity: \(error)")
+            print("Error requesting Live Activity: \(error)")
         }
     }
     
-    // Live Activity 종료
     // Live Activity 종료
     private func endLiveActivity() {
         Task {
@@ -222,7 +228,6 @@ struct ContentView: View {
                     timestamp: Date()
                 )
                 
-                // 최신 API 사용
                 await activity.end(ActivityContent(state: contentState, staleDate: nil), dismissalPolicy: .immediate)
             }
             currentActivity = nil
@@ -242,7 +247,7 @@ struct ContentView: View {
         )
         
         Task {
-            await activity.update(.init(state: contentState, staleDate: nil))
+            await activity.update(ActivityContent(state: contentState, staleDate: nil))
         }
     }
 }

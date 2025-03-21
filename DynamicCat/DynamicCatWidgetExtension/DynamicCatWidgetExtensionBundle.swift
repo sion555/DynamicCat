@@ -11,7 +11,7 @@ import SwiftUI
 @main
 struct DynamicCatWidgetExtensionBundle: WidgetBundle {
     var body: some Widget {
-        DynamicCatWidgetExtension()
+//        DynamicCatWidgetExtension()
         DynamicCatWidgetExtensionControl()
         DynamicCatLiveActivity()
 //        DynamicCatWidgetExtensionLiveActivity()
